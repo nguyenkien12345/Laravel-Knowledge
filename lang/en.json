@@ -1,0 +1,17 @@
+{
+    "welcome": "Welcome :username to the website :websitename",
+    "fruit": {
+        "avocado": "Avocado",
+        "apple": "Apple",
+        "orange": "Orange",
+        "banana": "Banana",
+        "grape": "Grape"
+    },
+    "animal": {
+        "dog": "Dog",
+        "cat": "Cat",
+        "camel": "Camel",
+        "fox": "Fox",
+        "lion": "Lion"
+    }
+}

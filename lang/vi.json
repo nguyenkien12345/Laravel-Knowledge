@@ -1,0 +1,17 @@
+{
+    "welcome": "Chào mừng :username đến với website :websitename",
+    "fruit": {
+        "avocado": "Bơ",
+        "apple": "Táo",
+        "orange": "Cam",
+        "banana": "Chuối",
+        "grape": "Nho"
+    },
+    "animal": {
+        "dog": "Chó",
+        "cat": "Mèo",
+        "camel": "Lạc đà",
+        "fox": "Cáo",
+        "lion": "Sư tử"
+    }
+}

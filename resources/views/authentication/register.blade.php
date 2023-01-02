@@ -1,0 +1,23 @@
+<form action="{{route('register')}}" method="POST">
+    @csrf
+    <input type="text"      name="name"     placeholder="Enter Your Name: "     style="display: block; margin-bottom: 10px"/>
+    <input type="email"     name="email"    placeholder="Enter Your Email: "    style="display: block; margin-bottom: 10px"/>
+    <input type="password"  name="password" placeholder="Enter Your Password: " style="display: block; margin-bottom: 10px"/>
+    <button type="submit">Register</button>
+</form>
+
+@if (session('success'))
+    <p style="display: block; margin-bottom: 10px; color: red; front-size: 20px">{{session('success')}}</p>
+@endif
+
+@if (session('error'))
+    <p style="display: block; margin-bottom: 10px; color: red; front-size: 20px">{{session('error')}}</p>
+@endif
+
+@if (count($errors))
+    <div class="alert alert-danger">
+        @foreach ($errors->all() as $error)
+            <p style="display: block; margin-bottom: 10px; color: red; front-size: 20px">{{$error}}</p>
+        @endforeach
+    </div>
+ @endif

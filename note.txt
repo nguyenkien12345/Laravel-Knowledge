@@ -1,0 +1,314 @@
+Khi tạo ra các migration phải lưu ý sắp sếp theo thứ tự quan hệ. (Vd migration categories và migration users phải được tạo trước migration posts)
+---------------------------------------------------------------------------------------------------------------------
++ Có 2 cách thiết lập đa ngôn ngữ trong laravel
+- 1 là dùng file php được tạo ra trong folder lang (tên key không được phép để khoảng trắng) => Hạn chế sử dụng
+- 2 là dùng file json được tạo ra trong folder lang (tên key được phép để khoảng trắng) => Nên sử dụng
+--------------------------------------------------------------------------------------------------------------------
+Mỗi lần ta khai báo gì mới trong autoload thì phải chạy lệnh: composer dump-autoload => Để cho nó nạp vào
+--------------------------------------------------------------------------------------------------------------------
+Gửi Mail trong laravel
+- Cấu hình môi trường trong file .env hoặc trong folder config\mail.php
+- Chạy lệnh tạo: php artisan make:mail DemoEmail
+- File sẽ xuất hiện trong app\Mail
+--------------------------------------------------------------------------------------------------------------------
+Hướng dẫn chạy lệnh queue trong laravel
+php artisan queue:work --queue=email (php artisan queue:work là câu lệnh chạy. email là cái name của cái queue đó)
+--------------------------------------------------------------------------------------------------------------------
+- Facade (Bề mặt, mặt ngoài => Nó đại diện cho 1 cái gì đó => Cho phép chúng ta truy cập đến các hàm static bên trong các service)
+- Alias (Định danh, bí danh) => Gán 1 cái facade cho 1 cái từ khóa nào đó để chúng ta khi sử dụng nó sẽ đơn giản hơn
+Vào config => app => Dưới cùng sẽ có 1 mảng các array alias do chúng ta tự định nghĩa (Thay vì chúng ta phải gọi nguyên cái namespace thì chúng ta
+chỉ cần gọi ra cái name của cái app ra (alias))
+
+- Sau khi tạo ra 1 Facade thì phải đăng ký Facade đó vào trong app\Providers\AppServiceProvider trong hàm register
+Luồng hoạt động:
+- Khi ta gọi Facade Menu trong file blade.php (file giao diện) là thực chất ta đang gọi MenuFacede trong Folder Menu/MenuFacade.php
+ và những phương thức trong MenuFacede này là khi mà mình đăng ký là nó đã nạp vào Menu/MenuFacade.php thông qua cái AppServiceProvider lúc ta đăng ký định nghĩa tên nó là
+ menu vừa trong Menu/MenuFacade.php và AppServiceProvider
+    Trong Menu/MenuFacade.php
+    protected static function getFacadeAccessor(){
+        return 'menu';
+    }
+
+    Trong AppServiceProvider
+    $this->app->singleton('menu', function(){
+        return new MenuManager();
+    });
+--------------------------------------------------------------------------------------------------------------------
+Authentication trong laravel
+- Cài thư viện authentication => composer require laravel/ui
+
+- Chạy lệnh khởi tạo để sinh ra các file view và controller => php artisan ui:auth => Lúc này trong folder app/Http/Controllers
+sẽ xuất hiện folder Auth kèm theo file HomeController nữa. Trong folder Auth này sẽ chứa các controller liên quan đến Authentication.
+Đồng thời trong folder resources/views cũng sẽ xuất hiện folder auth chứa các file view liên quan đến Authentication kèm theo file home.blade.php,
+Kèm theo folder layouts/app.blade.php
+Tiếp đến trong folder routes/web.php sẽ sinh ra 2 dòng khai báo sau:
+Auth::routes();
+Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+
+- Cài thư viện bootstrap => php artisan ui bootstrap => Sau đó chạy: npm install => npm run dev và chạy đồng thời 1 terminal khác với lệnh
+php artisan serve
+--------------------------------------------------------------------------------------------------------------------
+Để đăng nhập được vào hệ thống laravel chúng ta bắt buộc phải có guards và providers nằm trong config/auth.php
+--------------------------------------------------------------------------------------------------------------------
+Khi khởi tạo 1 file route mới chúng ta phải khai báo file route đó vào trong app/Providers/RouteServiceProvider nằm trong function boot
+--------------------------------------------------------------------------------------------------------------------
+Chạy câu lệnh cài Debugbar (Dùng để debug toàn bộ ứng dụng laravel (Ngoại trừ API))
+- composer require barryvdh/laravel-debugbar --dev
+- Sau khi cài Debugbar ta vào config/app.php -> Mục providers đoạn Package Service Providers -> Khai báo: Barryvdh\Debugbar\ServiceProvider::class
+- Sau khi cài Debugbar ta vào config/app.php -> Mục aliases -> Khai báo: 'Debugbar' => Barryvdh\Debugbar\Facades\Debugbar::class
+- Chạy lệnh: php artisan vendor:publish --provider="Barryvdh\Debugbar\ServiceProvider"
+- Lúc này trong folder config sẽ xuất hiện file debugbar.php
+--------------------------------------------------------------------------------------------------------------------
+Chạy câu lệnh cài telescope (Dùng để debug các API)
+- composer require laravel/telescope
+- php artisan telescope:install
+- php artisan migrate
+- php artisan telescope:publish
+- Gõ vào url: http://127.0.0.1:8000/telescope/requests (Nó sẽ hiển thị ra toàn bộ các request mà chúng ta đang request)
+--------------------------------------------------------------------------------------------------------------------
+Chạy câu lệnh cài laravel-ide-helper
+- composer require --dev barryvdh/laravel-ide-helper
+- php artisan vendor:publish --provider="Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider" --tag=config => Tạo ra 1 file _ide_helper.php trong folder config
+- php artisan ide-helper:generate => Tạo ra 1 file _ide_helper.php ngang hàng với các folder như app, vendor, tests, public...
+- php artisan ide-helper:models => Gõ no còn ko enter luôn vì mặc định là no
+- php artisan ide-helper:meta
+--------------------------------------------------------------------------------------------------------------------
+Các phương thức Upload file
+getClientSize('myFile')                 => Trả về dung lượng của file, tính theo bytes
+getClientMimeType('myFile')             => Trả về kiểu của file: image/png
+getClientOriginalName('myFile')         => Trả về tên của file
+getClientOriginalExtension('myFile')    => Trả về đuôi của file :png
+isValid('myFile')                       => Kiểm tra upload file có thành công hay không
+dd('name_file: ' . $name_file . ' - ' .'extension_file: ' . $extension_file . ' - ' . 'size_file: ' . $size_file . ' - ' . 'mimeType_file: ' . $mimeType_file);
+--------------------------------------------------------------------------------------------------------------------
+Get Data Between Two Dates
+use Carbon\Carbon;
+use App\Models\User;
+
+$date1 = '2021-09-04';
+$date2 = '2021-09-10';
+
+Cách 1
+User::whereBetween('created_at', [
+    $date1,
+    $date2
+])->count();
+=> Trả ra các data có giá trị từ ngày 04 đến ngày 09 tháng 09 năm 2021
+
+Cách 2
+User::whereBetween('created_at', [
+    $date1,
+    Carbon::parse($date2)->endOfDay()
+])->count();
+=> Trả ra các data có giá trị từ ngày 04 đến ngày 10 tháng 09 năm 2021
+--------------------------------------------------------------------------------------------------------------------
+Validation
+Viết trong controller: 'due_date' => 'required|date_format:Y-m-d'
+Viết trong html: <input type="date" name="due_date" class="form-control">
+Viết trong models (Trả về kiểu format mong muốn):
+
+Ghi đè getDueDateAttribute của models
+public function getDueDateAttribute($value){
+    return Carbon::parse($value)->format('d-m-Y');
+}
+
+Ghi đè getCreatedAtAttribute của models
+public function getCreatedAtAttribute($value){
+    return Carbon::parse($value)->format('d-m-Y');
+}
+=> Khi ta hiển thị 2 field due_date, created_at thì nó sẽ tự động được format lại
+--------------------------------------------------------------------------------------------------------------------
+How to Check date is expired or not using php and count remaining days
+
+$exp_date   = "2017/04/30";
+$today_date = "2017/04/31";
+
+// Convert to strtotime
+$exp   = strtotime($exp_date);
+$td    = strtotime($today_date);
+
+// Compare
+if($td > $exp){
+    // count how many days
+    $diff = $td - $exp;
+    $x = abs(floor($diff / (60 * 60 *24)));
+    echo "Product expire";
+    echo "<br/> After Expire Days: ".$x;
+}
+else{
+    $diff = $td - $exp;
+    $x = abs(floor($diff / (60 * 60 *24)));
+    echo "Product not expire";
+    echo "<br/> Already Expire Days: ".$x;
+}
+--------------------------------------------------------------------------------------------------------------------
+Làm ra Rule Check Time với Check Date trong laravel thông qua php artisan make:rule tên_rule
+php artisan make:rule DateBetween
+php artisan make:rule TimeBetween
+
+START RULE DateBetween
+public function passes($attribue, $value){
+    $pickupDate = Carbon::parse($value);
+    $lastDate   = Carbon::now()->addWeek();               // Lấy từ thời điểm hiện tại cộng thêm 7 ngày
+    return $value >= now() && $value <= $lastDate;        // Ngày được chọn phải nằm trong khoảng thời gian hiện tại đến khoảng thời gian + 7 ngày
+}
+
+public function message(){
+    return 'Please choose the date between a week from now';
+}
+END RULE DateBetween
+
+START RULE TimeBetween
+public function passes($attribue, $value){
+    $pickupDate = Carbon::parse($value);
+    $pickupTime = Carbon::createFromTime($pickupDate->hour, $pickupDate->minute, $pickupDate->second);
+    // When time's restaurant is open and close
+    $earliesTime = Carbon::createFromTimeString('17:00:00');
+    $lastTime = Carbon::createFromTimeString('23:00:00');
+    return $pickupTime->between($earliesTime, $lastTime) ? true : false;
+}
+
+public function message(){
+    return 'Please choose the time between 17:00 - 23:00';
+}
+END RULE TimeBetween
+--------------------------------------------------------------------------------------------------------------------
+Hướng dẫn cách tạo mã QR Code
+link website tham khảo: https://www.positronx.io/how-to-generate-various-qr-codes-in-laravel-application/
+link youtube tham khảo: https://www.youtube.com/watch?v=sIwA9h57_dc
+link website tham khảo: https://blog.tomosia.com/laravel-tao-ma-qr-trong-framework-laravel/ => Nên đọc
+Cài đặt thư viện: composer require simplesoftwareio/simple-qrcode
+--------------------------------------------------------------------------------------------------------------------
+Component trong laravel
+php artisan make:component Alert
+Hệ thống sẽ tạo class trong thư mục app\View\Components và view trong thư mục resources\views\components
+Sau khi tạo component xong phải đăng ký nó vào bên trong AppServiceProvider
+use Illuminate\Support\Facades\Blade
+
+Blade::component('package-alert', Alert::class); => Khai báo thằng này trong boot
+// Trong đó: package-alert: Tên dùng để gọi component bên view
+
+Gọi component
+<x-alert />
+Trong đó:
+x: là cú pháp bắt buộc
+alert: tên đã đăng ký ở Service Provider
+Nếu class component nằm trong 1 thư mục con, hãy gọi theo cú pháp sau:
+<x-inputs.button />
+(Gọi component button nằm trong folder con inputs)
+<x-forms.button />
+(Gọi component button nằm trong folder con forms)
+
+--------------------------------------------------------------------------------------------------------------------
+Mặc định, Laravel sẽ cache view vào trong folder: storage/framework/views
+Khi có Request mới, Laravel sẽ kiểm tra xem file cache có tồn tại hoặc hết hạn
+    - Nếu hết hạn hoặc không tồn tại: Hệ thống sẽ tạo bản cache mới
+    - Nếu tồn tại và chưa hết hạn: Hệ thống sẽ giữ bản cache cũ cho đến khi hết hạn hoặc bị xóa
+Laravel cung cấp cho chúng ta 2 Command Line để thuận tiện hơn cho lập trình viên trong quá trình phát triển ứng dụng
+Cache View: php artisan view:cache
+Clear Cache View: php artisan view:clear
+--------------------------------------------------------------------------------------------------------------------
+HTTP Response
+
+return response()->json([
+    'name' => 'Nguyễn Trung Kiên',
+    'age' => 22,
+    'school' => 'Hoa Sen University'
+], 201)->header('Api-key', '1139110256')
+Trả về data json kèm theo trạng thái trả về và header trả về
+
+Nếu Route của bạn có tham số:
+return redirect()->route('profile', ['id' => 1]);
+Hoặc
+return redirect(route('profile', ['id' => 1]));
+--------------------------------------------------------------------------------------------------------------------
+Trả về Response dạng Download File
+--------------------------------------------------------------------------------------------------------------------
+Tích hợp FCM vào laravel
+- Vào Project Overview => Project settings => Cloud Messaging => Copy Server key (Chính là FCM key) và Sender ID
+(Nếu không thấy Server key thì click vào dấu 3 chấm dọc trong mục Cloud Messaging API (Legacy) Disabled => Nhấn Manage API in Google Cloud Console
+=> Nhấn ENABLE để sinh ra Server key và Sender ID)
+
+- Thay cấu hình firebase mà ta setup dự án vào public\firebase-messaging-sw.js và trong script của file pushnotificationdemo/index.blade.php
+
+- Thay Server key vào trong function sendNotification của file PushNotificationController.php
+--------------------------------------------------------------------------------------------------------------------
+OTP FIREBASE Laravel
+Vào Authentication => Sign-in method => Phone => Click Enable => Click Save
+Vào tiếp Settings => Mục Domains => Authorised domains => Click Add Domain => Gõ localhost
+Các đường dẫn url sau này thay 127.0.0.1 bằng localhost
+--------------------------------------------------------------------------------------------------------------------
+Hướng dẫn tạo mã Captcha trong laravel (Tài liệu để follow theo: https://github.com/mewebstudio/captcha)
+- composer require mews/captcha
+
+- Lưu ý: Để sử dụng bất kỳ nhà cung cấp dịch vụ nào (Service Provider), chúng ta phải đăng ký nhà cung cấp dịch vụ (Service Provider)
+khi khởi động ứng dụng Laravel của mình. Về cơ bản có hai cách để làm điều này.
+
+- Vào folder config/app.php khai báo vào trong providers và aliases lần lượt như sau:
+    'providers' => [
+        // ...
+        Mews\Captcha\CaptchaServiceProvider::class,
+    ]
+
+    'aliases' => [
+        // ...
+        'Captcha' => Mews\Captcha\Facades\Captcha::class,
+    ]
+
+- Để sử dụng cài đặt của riêng bạn, hãy xuất bản config: php artisan vendor:publish
+Lúc này sẽ xuất hiện file captcha.php trong folder config (Ta sẽ thoải mái cấu hình file captcha tùy theo ý muốn)
+- captcha_img() sẽ nhận các options (Key của mảng trong file captcha.php)
+VD: captcha_img('math'), captcha_img('mini')
+--------------------------------------------------------------------------------------------------------------------
+Hướng dẫn Compress Image và Resize Image (Tài liệu để follow theo: https://image.intervention.io/v2/api/)
+- composer require intervention/image
+
+- Lưu ý: Để sử dụng bất kỳ nhà cung cấp dịch vụ nào (Service Provider), chúng ta phải đăng ký nhà cung cấp dịch vụ (Service Provider)
+khi khởi động ứng dụng Laravel của mình. Về cơ bản có hai cách để làm điều này.
+
+- Vào folder config/app.php khai báo vào trong providers và aliases lần lượt như sau:
+
+    'providers' => [
+        // ...
+        Intervention\Image\ImageServiceProvider::class,
+    ]
+
+    'aliases' => [
+        // ...
+        'Image' => Intervention\Image\Facades\Image::class
+    ]
+
+- Để sử dụng cài đặt của riêng bạn, hãy xuất bản config: php artisan vendor:publish --provider="Intervention\Image\ImageServiceProviderLaravelRecent"
+--------------------------------------------------------------------------------------------------------------------
+Hướng dẫn sử dụng google translate (Tài liệu để follow theo: https://packagist.org/packages/stichoza/google-translate-php)
+- composer require stichoza/google-translate-php
+- Sử dụng cơ bản
+use Stichoza\GoogleTranslate\GoogleTranslate;
+$tr = new GoogleTranslate('en'); // Translates into English (Dịch sang tiếng Anh)
+
+- Hoặc bạn có thể thay đổi ngôn ngữ sau
+$tr = new GoogleTranslate(); // Translates to 'en' from auto-detected language by default (Dịch sang 'en' từ ngôn ngữ được phát hiện tự động theo mặc định)
+$tr->setSource('en'); // Translate from English (Dịch từ tiếng Anh)
+$tr->setSource(); // Detect language automatically (Tự động phát hiện ngôn ngữ)
+$tr->setTarget('ka'); // Translate to Georgian (Dịch sang tiếng Gruzia)
+
+- Debug:
+echo  $tr>setSource('in')->setTarget('in')->translate('Tạm biệt'); (Dịch từ ngôn ngữ nào sang ngôn ngữ nào)
+
+Tài liệu các ký hiệu ngôn ngữ
+https://cloud.google.com/translate/docs/languages
+--------------------------------------------------------------------------------------------------------------------
+Hướng dẫn sử dụng ShortURL (Tài liệu để follow theo: https://packagist.org/packages/shorturl/shorturl)
+- composer require shorturl/shorturl
+- Sử dụng cơ bản
+use ShortURL\ShortURL\Shorten;
+$shorten = new Shorten();
+echo $shorten->text('https://google.com');
+
+
+
+
+
+
+
+
