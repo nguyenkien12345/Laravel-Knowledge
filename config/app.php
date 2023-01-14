@@ -190,6 +190,7 @@ return [
         Barryvdh\Debugbar\ServiceProvider::class,
         Mews\Captcha\CaptchaServiceProvider::class,
         Intervention\Image\ImageServiceProvider::class,
+        Stevebauman\Location\LocationServiceProvider::class,
         // SimpleSoftwareIO\QrCode\ServiceProvider::class,
 
         /*
@@ -223,6 +224,7 @@ return [
         'Menu' => App\Menu\Facade\MenuFacade::class,
         'Captcha' => Mews\Captcha\Facades\Captcha::class,
         'Image' => Intervention\Image\Facades\Image::class,
+        'Location' => Stevebauman\Location\Facades\Location::class,
     ])->toArray(),
 ];
 

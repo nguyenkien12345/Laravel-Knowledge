@@ -19,7 +19,7 @@ class LocalizationMiddleware
     public function handle(Request $request, Closure $next)
     {
         // Lấy ra ngôn ngữ đang được set cho trang web thông qua seesion.
-        // Nếu không tồn tại giá trị language trong session thì lấy thông qua biến locale trong file app
+        // Nếu không tồn tại giá trị language trong session thì lấy thông qua biến language trong file app
         $language = Session::get('language', config('app.locale'));
         // Set lại giá trị cho ngôn ngữ mặc định hiển thị ra website
         App::setLocale($language);

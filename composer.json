@@ -17,6 +17,7 @@
         "mews/captcha": "^3.2",
         "shorturl/shorturl": "^1.2",
         "simplesoftwareio/simple-qrcode": "^4.2",
+        "stevebauman/location": "^6.5",
         "stichoza/google-translate-php": "^5.1"
     },
     "require-dev": {

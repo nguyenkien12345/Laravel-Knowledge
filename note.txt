@@ -304,6 +304,30 @@ Hướng dẫn sử dụng ShortURL (Tài liệu để follow theo: https://pack
 use ShortURL\ShortURL\Shorten;
 $shorten = new Shorten();
 echo $shorten->text('https://google.com');
+--------------------------------------------------------------------------------------------------------------------
+How to restrict or block user access from ip address in laravel (Cách hạn chế hoặc chặn quyền truy cập của người dùng từ địa chỉ ip trong laravel)
+- Tạo 1 middleware để thực hiện việc này => php artisan make:middleware NameOfMiddleware
+- Vào app/Http/Kernel.php để khai báo middleware này vào trong mục $middlewareGroups phần web và phần api
+--------------------------------------------------------------------------------------------------------------------
+How To Get Location Information With IP Address In Laravel (Tài liệu để follow theo: https://github.com/stevebauman/location)
+- composer require stevebauman/location
+
+- Lưu ý: Để sử dụng bất kỳ nhà cung cấp dịch vụ nào (Service Provider), chúng ta phải đăng ký nhà cung cấp dịch vụ (Service Provider)
+khi khởi động ứng dụng Laravel của mình. Về cơ bản có hai cách để làm điều này.
+
+- Vào folder config/app.php khai báo vào trong providers và aliases lần lượt như sau:
+
+    'providers' => [
+        // ...
+        Stevebauman\Location\LocationServiceProvider::class
+    ]
+
+    'aliases' => [
+        // ...
+        'Location' => Stevebauman\Location\Facades\Location::class,
+    ]
+
+- Để sử dụng cài đặt của riêng bạn, hãy xuất bản config: php artisan vendor:publish
 
 
 

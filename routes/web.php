@@ -21,6 +21,9 @@ use App\Http\Controllers\SettingController;
 use App\Http\Controllers\OtpFireBaseController;
 use App\Http\Controllers\CaptchaController;
 use App\Http\Controllers\SomeInteractImageController;
+use App\Http\Controllers\LocationController;
+use App\Http\Controllers\LocalizationControlller;
+use App\Http\Controllers\EmployeeController;
 
 use Stichoza\GoogleTranslate\GoogleTranslate;
 
@@ -207,3 +210,26 @@ route::get('test-shortURL', function(){
     // dd($data);
 })->name('test-shortURL');
 // END TEST ShortURL //
+
+// START Demo Restrict IP //
+route::get('demo-restrict-ip', function(){
+    return '<h1>Mai Thị Thanh Thúy (NOT API)</h1>';
+});
+
+route::get('api/demo-restrict-ip', function(){
+    return '<h1>Mai Thị Thanh Thúy (API)</h1>';
+});
+
+// START Demo Location //
+route::get('show-data-location', [LocationController::class, 'index']);
+// END Demo Location //
+
+// START Demo Localization //
+route::get('locale', [LocalizationControlller::class, 'index']);
+route::get('locale/{language}', [LocalizationControlller::class, 'setLang']);
+// END Demo Localization //
+
+// START Demo Multi Step //
+route::get('multistep', [EmployeeController::class, 'index'])->name('multistep');
+route::post('post-multistep', [EmployeeController::class, 'postMultiStep'])->name('post-multistep');
+// END Demo Multi Step //
