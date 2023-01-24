@@ -104,6 +104,16 @@ Route::prefix('authentication')->middleware(['check-admin'])->group(function(){
 
 Route::get('check-user-is-online', [AuthController::class, 'getAllUser'])->name('check-user-is-online');
 
+Route::get('users-soft-force-restore', [AuthController::class, 'getAllUserSoftDeleteRestore'])->name('users-soft-force-restore');
+
+Route::get('softDelete/{user_id}', [AuthController::class, 'softDelete'])->name('softDelete');
+Route::get('forceDelete/{user_id}', [AuthController::class, 'forceDelete'])->name('forceDelete');
+
+Route::get('trashed', [AuthController::class, 'trashed'])->name('trashed');
+
+Route::get('restore/{user_id}', [AuthController::class, 'restore'])->name('restore');
+Route::get('restore-all', [AuthController::class, 'restoreAll'])->name('restore-all');
+
 // Localization (Đa ngôn ngữ)
 // Nơi setup ngôn ngữ chính là folder lang
 // Setup lại ngôn ngữ cho trang web
