@@ -182,23 +182,44 @@ Cài đặt thư viện: composer require simplesoftwareio/simple-qrcode
 Component trong laravel
 php artisan make:component Alert
 Hệ thống sẽ tạo class trong thư mục app\View\Components và view trong thư mục resources\views\components
+
 Sau khi tạo component xong phải đăng ký nó vào bên trong AppServiceProvider
 use Illuminate\Support\Facades\Blade
-
 Blade::component('package-alert', Alert::class); => Khai báo thằng này trong boot
 // Trong đó: package-alert: Tên dùng để gọi component bên view
+// Alert: Tên class Component
 
 Gọi component
 <x-alert />
 Trong đó:
 x: là cú pháp bắt buộc
 alert: tên đã đăng ký ở Service Provider
+
 Nếu class component nằm trong 1 thư mục con, hãy gọi theo cú pháp sau:
 <x-inputs.button />
-(Gọi component button nằm trong folder con inputs)
-<x-forms.button />
-(Gọi component button nằm trong folder con forms)
+(Gọi component button nằm trong folder con inputs) => Cú pháp app\View\Components\Inputs\Button.php
 
+<x-forms.button />
+(Gọi component button nằm trong folder con forms) => Cú pháp app\View\Components\Forms\Button.php
+
+Chúng ta có thể không cần đăng ký Component vào trong function boot của AppServiceProvider => Ta chỉ cần tại đứng tại file view mà chúng ta muốn hiển thị
+component gõ đúng đường dẫn gọi đến file đó
+VD: <x-inputs.button /> (Nghĩa là vào folder Inputs file button.blade.php (x) là cú pháp bắt buộc)
+VD: <x-forms.button />  (Nghĩa là vào folder Forms file button.blade.php (x) là cú pháp bắt buộc)
+
+Truyền dữ liệu vào component
+<x-alert type="error" :message="$message" />
+Dữ liệu được truyền vào giống thuộc tính của HTML. Nếu muốn biên dịch biến, ban cần thêm dấu : phía trước thuộc tính
+Với các dữ liệu tĩnh (không phải biến trong laravel mà chỉ có mỗi nội dung string, number thì thuộc tính không cần thêm dấu : vào trước (VD: type="error"))
+Với các dữ liệu động (là biến trong laravel thì thuộc tính cần thêm dấu : vào trước (VD: :message="$message"))
+
+VD2: <x-alert type="warning" :text="$typeBooking" />
+
+Lưu ý:
+- Bạn cần đặt thuộc tính bên class component là public
+- Nếu tên thuộc tính trong class component ở dạng camelCase => Khi gọi component cần chuyển thuộc tính thành dấu gạch ngang (-)
+VD2: <x-alert type="warning" :text="$typeBooking" data-icon="facebook" />
+Mặc dù bên component đang để tên biến là dataIcon nhưng khi truyền thuộc tính vào component bên view ta phải dùng snake cake không được dùng camelCase
 --------------------------------------------------------------------------------------------------------------------
 Mặc định, Laravel sẽ cache view vào trong folder: storage/framework/views
 Khi có Request mới, Laravel sẽ kiểm tra xem file cache có tồn tại hoặc hết hạn
@@ -328,6 +349,100 @@ khi khởi động ứng dụng Laravel của mình. Về cơ bản có hai các
     ]
 
 - Để sử dụng cài đặt của riêng bạn, hãy xuất bản config: php artisan vendor:publish
+--------------------------------------------------------------------------------------------------------------------
+Kiểm tra hệ điều hành, trình duyệt, thiết bị đang chạy trong laravel (Operating system browser and device detection in laravel)
+(Tài liệu để follow theo: https://packagist.org/packages/hisorange/browser-detect)
+
+- composer require hisorange/browser-detect
+--------------------------------------------------------------------------------------------------------------------
+Cách tạo 1 token trong laravel
+- Khi đăng nhập thành công (nhập tài khoản và mật khẩu hợp lệ) thì ta tạo token thông qua hàm createToken
+- createToken nhận vào 1 tham số chính là name mà ta đặt tên cho token đó
+- plainTextToken: Lấy token đó ra và trả về
+-Token này sẽ được sinh ra trong bảng personal_access_tokens
+$token = $user->createToken('authToken')->plainTextToken;
+
+Cách lấy ra thông tin của token hiện tại
+- auth()->user()-currentAccessToken()
+
+Cách xóa token
+public function logout(){
+    // Cách 1
+    // Xóa tất cả các token (phiên đăng nhập) liên quan đến user (hiện tại) đang thực hiện đăng nhập
+    auth()->user()-tokens()->delete();
+
+    // Cách 2
+    // Xóa cái token (phiên đăng nhập) gần nhất (mới nhất) liên quan đến user (hiện tại) đang thực hiện đăng nhập
+    auth()->user()-currentAccessToken()->delete();
+
+    // Cách 3
+    // Xóa cái token được chỉ định
+    auth()->user()->tokens()->where('id', $tokenId)->delete();
+}
+--------------------------------------------------------------------------------------------------------------------
+Events là 1 hành động hay là 1 tác vụ nào đó xảy ra ở 1 thời điểm nhất định. Trong đời thường cũng như trong quá trình hoạt động của 1 ứng dụng thì có nhiều
+cái event xảy ra
+
+Cách tạo event và listener
+- php artisan make:event PodcastProcessed
+- php artisan make:listener SendPostcastProcessed --event=PodcastProcessed
+ (--event=PodcastProcessed: Khi chúng ta tạo listen thì mặc định nó sẽ tiêm cái thằng event này vào trong cái hàm handle)
+
+ Vd về cách gọi event:
+ Cách 1
+Route::get('/', function () {
+    event(new \App\Events\PodcastProcessed());
+    return view('welcome');
+});
+
+ Cách 2
+Route::get('/', function () {
+    \App\Events\DemoEvent::dispatch('Mai Thị Thanh Thúy', '23');
+    return view('welcome');
+});
+--------------------------------------------------------------------------------------------------------------------
+Sự khác biệt giữa middleware và gate
+- middleware dùng để kiểm tra đầu vào và điều hướng request là có được phép đi tiếp hay không, nếu hợp lệ thì cho đi tiếp. Thường áp dụng cho nhóm route
+- gate dùng để kiểm tra đầu vào và điều hướng request là có được phép đi tiếp hay không, nếu hợp lệ thì cho đi tiếp còn khi đi đến đó
+có được phép thực hiện hay không thì gate sẽ quyết định. Thường sẽ chỉ được sử dụng ỏ tầng controller (Không liên quan đến 1 model cụ thể nào)
+Thường áp dụng riêng lẻ cho từng route
+Thường phần Authorization sẽ được khai báo trong App\Provider\ServiceProvider
+
+Sự khác biệt giữa gate và policy
+- gate và policy đều là phân quyền và cho phép là hành động nào được phép thực hiện, hành động nào không được phép thực hiện
+- gate là  các cái class do ta tự khai báo
+- policy là các cái class có sẵn được tích hợp trong laravel. Thường dùng lệnh cmd để tạo ra. Quản lý những logic mà trong
+cái việc phân quyền liên quan đến model gắn liền với model cụ thể
+- Giống như thằng gate thì policy cũng nhận tham số đầu tiên là thằng user. Mặc định là tham số user luôn luôn được truyền vào rồi nên ta không cần truyền vào nữa
+- gate với policy nó cũng như route vậy cũng có phương thức resource để quản lý các phương thức CRUD
+- policy thực chất vẫn là gate
+
+Câu lệnh tạo policy:
+- php artisan make:policy CommentPolicy --model=Comment_Authorization (Tạo ra policy để sử dụng riêng cho model Comment_Authorization)
+- Sau khi tạo policy xong thì ta sẽ khai báo nó vào trong App\Provider\AuthServiceProvider
+Gate::resource('comments', 'CommentPolicy'); // truyền vào tên policy (ta tự đặt tên) và CommentPolicy mà chúng ta tạo
+- Tìm đến nơi khai báo protected $policies = []; và khai báo cái model kèm với policy tương ứng của model đó
+VD:
+protected $policies = [
+    Comment::class => CommentPolicy::class
+];
+
+Cách sử dụng can và cannot trong hiển thị danh sách ở file view
+// Những comment nào mà có user id trùng với user id của người dùng đang đăng nhập thì mới hiển thị ra chữ EDIT
+@foreach($comments as $comment)
+    <tr>
+        <td scope='row'>{{ $comment->id }}</td>
+        <td>{{ $comment->content }}</td>
+        <td>{{ $comment->note }}</td>
+        <td>
+            @can('update', $comment)
+                <a href="{{ route('comment.edit',$comment->id ) }}">EDIT</a>
+            @endcan
+        </td>
+    </tr>
+@endforeach
+
+
 
 
 

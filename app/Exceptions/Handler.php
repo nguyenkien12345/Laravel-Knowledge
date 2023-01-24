@@ -3,8 +3,11 @@
 namespace App\Exceptions;
 
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
-use Throwable;
+use Illuminate\Auth\AuthenticationException;
+// use Throwable;
 
+
+// Đây là nơi cấu hình thông báo lỗi trả về từ laravel
 class Handler extends ExceptionHandler
 {
     /**
@@ -43,8 +46,17 @@ class Handler extends ExceptionHandler
      */
     public function register()
     {
-        $this->reportable(function (Throwable $e) {
-            //
+        // Tất cả các request hay tất cả các lỗi nó đều sẽ đi vô đây
+        $this->renderable(function (AuthenticationException $authen, $request) {
+            // Nếu như request của chúng ta mà có prefix là api và khi nó bị lỗi thì nó sẽ chạy vào hàm dưới đây
+            // Demo: http://127.0.0.1:8000/api/user
+            if($request->is('api/*')){
+                return response()->json([
+                    "message" => "Api Failure",
+                    "status" => false,
+                    "code" => 1000
+                ], 400);
+            }
         });
     }
 }

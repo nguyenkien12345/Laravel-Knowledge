@@ -106,4 +106,12 @@ class AuthController extends Controller
     public function getGirlView(){
         return view('demo.girl');
     }
+
+    public function getAllUser(){
+        $users = User::all();
+
+        $data['users'] = $users;
+
+        return view('checkUserIsOnline.index', $data);
+    }
 }

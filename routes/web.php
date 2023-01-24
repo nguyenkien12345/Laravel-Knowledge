@@ -24,12 +24,20 @@ use App\Http\Controllers\SomeInteractImageController;
 use App\Http\Controllers\LocationController;
 use App\Http\Controllers\LocalizationControlller;
 use App\Http\Controllers\EmployeeController;
+use App\Http\Controllers\DetectionController;
+use App\Http\Controllers\ChartController;
 
 use Stichoza\GoogleTranslate\GoogleTranslate;
-
 use ShortURL\ShortURL\Shorten;
 
 Route::get('/', function () {
+    // Gọi sự kiện event
+    // Cách 1
+    // event(new \App\Events\PodcastProcessed());
+
+    // Cách 2
+//    \App\Events\DemoEvent::dispatch('Nguyễn Trung Kiên', '22');
+//    \App\Events\DemoEvent::dispatch('Mai Thị Thanh Thúy', '23');
     return view('welcome');
 });
 
@@ -93,6 +101,8 @@ Route::prefix('authentication')->middleware(['check-admin'])->group(function(){
     Route::get('boy', [AuthController::class, 'getBoyView'])->name('get-boy-view');
     Route::get('girl', [AuthController::class, 'getGirlView'])->name('get-girl-view');
 });
+
+Route::get('check-user-is-online', [AuthController::class, 'getAllUser'])->name('check-user-is-online');
 
 // Localization (Đa ngôn ngữ)
 // Nơi setup ngôn ngữ chính là folder lang
@@ -233,3 +243,11 @@ route::get('locale/{language}', [LocalizationControlller::class, 'setLang']);
 route::get('multistep', [EmployeeController::class, 'index'])->name('multistep');
 route::post('post-multistep', [EmployeeController::class, 'postMultiStep'])->name('post-multistep');
 // END Demo Multi Step //
+
+// START Demo Operating system browser and device detection in laravel //
+route::get('detection', [DetectionController::class, 'index'])->name('detection');
+// END Demo Operating system browser and device detection in laravel //
+
+// START Demo Chart //
+route::get('chart', [ChartController::class, 'index'])->name('chart');
+// END Demo Chart //

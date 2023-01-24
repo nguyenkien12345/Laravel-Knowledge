@@ -6,13 +6,16 @@ use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Laravel\Sanctum\HasApiTokens;
 use App\Models\Post;
 use App\Models\Comment;
+use Cache;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
-    use HasApiTokens, HasFactory, Notifiable;
+    // Bô sung thư viện xóa mềm
+    use HasApiTokens, HasFactory, Notifiable, SoftDeletes;
 
     protected $table = 'users';
 
@@ -42,5 +45,9 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function comments(){
         return $this->hasMany(Comment::class);
+    }
+
+    public function checkUserIsOnline(){
+        return Cache::has('user-is-online-' . $this->user_id);
     }
 }

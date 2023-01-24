@@ -39,6 +39,7 @@ class Kernel extends HttpKernel
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
             \App\Http\Middleware\RestrictIpAddressMiddleware::class,
             \App\Http\Middleware\LocalizationMiddleware::class,
+            \App\Http\Middleware\CheckOnlineUserMiddleware::class,
         ],
 
         'api' => [
